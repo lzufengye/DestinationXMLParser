@@ -1,18 +1,24 @@
 class DestinationXMLParser
   def initialize taxonomy_file_name, destinations_file_name, out_put_file_name
-    input_file = File.open(taxonomy_file_name)
-    doc = Nokogiri::XML(input_file)
-    @taxonomy_root = doc.root
+    @input_taxonomy_file = File.open(taxonomy_file_name)
+    @taxonomy_doc = Nokogiri::XML(@input_taxonomy_file)
+    @taxonomy_root = @taxonomy_doc.root
 
-    input_file = File.open(destinations_file_name)
-    doc = Nokogiri::XML(input_file)
-    @destinations_root = doc.root
+    @input_destinations_file = File.open(destinations_file_name)
+    @destinations_doc = Nokogiri::XML(@input_destinations_file)
+    @destinations_root = @destinations_doc.root
 
-    @output_file = File.open(out_put_file_name, 'w')
+    @output_file = File.open(out_put_file_name, 'w+')
   end
 
   def parse
     parse_node @taxonomy_root, 0
+  end
+
+  def close
+    @input_taxonomy_file.close
+    @input_destinations_file.close
+    @output_file.close
   end
 
   private
