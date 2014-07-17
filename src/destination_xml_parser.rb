@@ -46,6 +46,7 @@ class DestinationXMLParser
     print_transport(depth, node)
     print_weather(depth, node)
     print_work_live_study(depth, node)
+    @output_file.puts ''
   end
 
   def print_work_live_study(depth, node)
