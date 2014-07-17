@@ -1,12 +1,14 @@
 class DestinationXMLParser
-  def initialize taxonomy_file_name, destinations_file_name
-    f = File.open(taxonomy_file_name)
-    doc = Nokogiri::XML(f)
+  def initialize taxonomy_file_name, destinations_file_name, out_put_file_name
+    input_file = File.open(taxonomy_file_name)
+    doc = Nokogiri::XML(input_file)
     @taxonomy_root = doc.root
 
-    f = File.open(destinations_file_name)
-    doc = Nokogiri::XML(f)
+    input_file = File.open(destinations_file_name)
+    doc = Nokogiri::XML(input_file)
     @destinations_root = doc.root
+
+    @output_file = File.open(out_put_file_name, 'w')
   end
 
   def parse
@@ -42,106 +44,106 @@ class DestinationXMLParser
 
   def print_work_live_study(depth, node)
     print_tab depth+2
-    print '- work_live_study'
+    @output_file.print '- work_live_study'
     print_tab depth+4
-    print '- work'
+    @output_file.print '- work'
     print_tab depth+6
-    print '- business'
+    @output_file.print '- business'
     print_desgitnation_info node.at_xpath('work_live_study/work'), 'business'
     print_tab depth+6
-    print '- overview'
+    @output_file.print '- overview'
     print_desgitnation_info node.at_xpath('work_live_study/work'), 'overview' if node
   end
 
   def print_weather(depth, node)
     print_tab depth+2
-    print '- weather'
+    @output_file.print '- weather'
     print_tab depth+4
-    print '- when_to_go'
+    @output_file.print '- when_to_go'
     print_tab depth+6
-    print '- climate'
+    @output_file.print '- climate'
     print_desgitnation_info node.at_xpath('weather/when_to_go'), 'climate' if node
   end
 
   def print_transport(depth, node)
     print_tab depth+2
-    print '- transport'
+    @output_file.print '- transport'
     print_tab depth+4
-    print '- getting_there_and_around'
+    @output_file.print '- getting_there_and_around'
     print_tab depth+6
-    print '- air'
+    @output_file.print '- air'
     print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'air'
     print_tab depth+6
-    print '- bicycle'
+    @output_file.print '- bicycle'
     print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'bicycle'
     print_tab depth+6
-    print '- bus_and_tram'
+    @output_file.print '- bus_and_tram'
     print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'bus_and_tram'
     print_tab depth+6
-    print '- car_and_motorcycle'
+    @output_file.print '- car_and_motorcycle'
     print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'car_and_motorcycle'
     print_tab depth+6
-    print '- local_transport'
+    @output_file.print '- local_transport'
     print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'local_transport'
     print_tab depth+6
-    print '- overview'
+    @output_file.print '- overview'
     print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'overview' if node
     print_tab depth+6
-    print '- train'
+    @output_file.print '- train'
     print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'train'
   end
 
   def print_practical_information(depth, node)
     print_tab depth+2
-    print '- practical_information'
+    @output_file.print '- practical_information'
     print_tab depth+4
-    print '- health_and_safety'
+    @output_file.print '- health_and_safety'
     print_tab depth+6
-    print '- dangers_and_annoyances'
+    @output_file.print '- dangers_and_annoyances'
     print_desgitnation_info node.at_xpath('practical_information/health_and_safety'), 'dangers_and_annoyances'
     print_tab depth+6
-    print '- while_youre_there'
+    @output_file.print '- while_youre_there'
     print_desgitnation_info node.at_xpath('practical_information/while_youre_there'), 'while_youre_there'
     print_tab depth+4
-    print '- money_and_costs'
+    @output_file.print '- money_and_costs'
     print_tab depth+6
-    print '- costs'
+    @output_file.print '- costs'
     print_desgitnation_info node.at_xpath('practical_information/money_and_costs'), 'costs'
     print_tab depth+6
     print_desgitnation_info node, 'money'
     print_tab depth+4
-    print '- visas'
+    @output_file.print '- visas'
     print_tab depth+6
-    print '- overview'
+    @output_file.print '- overview'
     print_desgitnation_info node.at_xpath('practical_information/visas'), 'overview' if node
   end
 
   def print_introductory(depth, node)
     print_tab depth+2
-    print '- introductory'
+    @output_file.print '- introductory'
     print_tab depth+4
-    print '- introduction'
+    @output_file.print '- introduction'
     print_tab depth+6
-    print '- overview '
+    @output_file.print '- overview '
     print_desgitnation_info node.at_xpath('introductory/introduction'), 'overview' if node
   end
 
   def print_history(depth, node)
     print_tab depth+2
-    print '- history:'
+    @output_file.print '- history:'
     print_tab depth+4
     print_desgitnation_info node, 'history'
   end
 
   def print_desgitnation_info node, title
     return unless node
-    p node.at_xpath(title).text if node.at_xpath(title)
+    @output_file.print node.at_xpath(title).text.sub(/\n\n\n/, '') if node.at_xpath(title)
   end
 
   def print_atlas(depth, node)
-    depth.times { print '  ' }
-    print "- #{node['atlas_node_id']} "
-    p "#{node.at_xpath('node_name').text}"
+    depth.times { @output_file.print '  ' }
+    @output_file.print "- #{node['atlas_node_id']} "
+    @output_file.puts "#{node.at_xpath('node_name').text}"
   end
 
 
@@ -154,7 +156,7 @@ class DestinationXMLParser
   end
 
   def print_tab depth
-    p ''
-    depth.times { print '  ' }
+    @output_file.puts ''
+    depth.times { @output_file.print '  ' }
   end
 end
