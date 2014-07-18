@@ -34,7 +34,8 @@ class DestinationXMLParser
     print_atlas node, depth
     atlas_destinations = select_destination_by_atlas_id node['atlas_node_id']
     atlas_destinations.each do |destination_node|
-      print_destination_node destination_node, depth + 1
+      displayed_node_name = []
+      print_destination_node destination_node, depth + 1, displayed_node_name
     end
   end
 
@@ -59,20 +60,17 @@ class DestinationXMLParser
   end
 
 
-  def print_destination_node node, depth
+  def print_destination_node node, depth, displayed_node_name
     print_tab depth
     depth += 1
     return if node.text?
-
-    @output_file.print "- #{node.node_name}" if node.node_name
-    if node.node_name == 'history'
-      print_tab depth
-      @output_file.print node.at_xpath('history').text.gsub(/\n/, ' ')
-      return
+    if node.node_name && !(displayed_node_name.include? node.node_name)
+      @output_file.print "- #{node.node_name}"
+      displayed_node_name << node.node_name
     end
     @output_file.print node.text.gsub(/\n/, ' ') unless node.node_name
     node.children.each do |child_node|
-      print_destination_node child_node, depth
+      print_destination_node child_node, depth, displayed_node_name
     end
   end
 end
