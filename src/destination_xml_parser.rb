@@ -66,10 +66,11 @@ class DestinationXMLParser
 
     @output_file.print node.node_name if node.node_name
     if node.node_name == 'history'
-      @output_file.print node.at_xpath('history').text
+      print_tab depth
+      @output_file.print node.at_xpath('history').text.gsub(/\n/, ' ')
       return
     end
-    @output_file.print node.text unless node.node_name
+    @output_file.print node.text.gsub(/\n/, ' ') unless node.node_name
     node.children.each do |child_node|
       print_destination_node child_node, depth
     end
