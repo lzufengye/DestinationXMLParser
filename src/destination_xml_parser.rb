@@ -24,23 +24,22 @@ class DestinationXMLParser
   private
   def parse_node node, depth
     depth += 1
-    handle_atlas(depth, node) if node['atlas_node_id']
+    handle_atlas node, depth if node['atlas_node_id']
     node.children.each do |child_node|
       parse_node child_node, depth
     end
   end
 
-  def handle_atlas(depth, node)
-    print_atlas(depth, node)
-    depth += 1
+  def handle_atlas node, depth
+    print_atlas node, depth
     atlas_destinations = select_destination_by_atlas_id node['atlas_node_id']
     atlas_destinations.each do |destination_node|
-      print_destination_node destination_node, depth
+      print_destination_node destination_node, depth + 1
     end
   end
 
-  def print_atlas(depth, node)
-    depth.times { @output_file.print '  ' }
+  def print_atlas node, depth
+    print_tab depth
     @output_file.print "- #{node['atlas_node_id']} "
     @output_file.puts "#{node.at_xpath('node_name').text}"
   end
