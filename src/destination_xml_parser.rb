@@ -34,8 +34,8 @@ class DestinationXMLParser
     print_atlas node, depth
     atlas_destinations = select_destination_by_atlas_id node['atlas_node_id']
     atlas_destinations.each do |destination_node|
-      displayed_node_name = []
-      print_destination_node destination_node, depth + 1, displayed_node_name
+      node_name_need_merged = []
+      print_destination_node destination_node, depth + 1, node_name_need_merged
     end
   end
 
@@ -66,7 +66,7 @@ class DestinationXMLParser
     return if node.text?
     if node.node_name && !(displayed_node_name.include? node.node_name)
       @output_file.print "- #{node.node_name}"
-      displayed_node_name << node.node_name
+      displayed_node_name << node.node_name if node.node_name == 'history'
     end
     @output_file.print node.text.gsub(/\n/, ' ') unless node.node_name
     node.children.each do |child_node|
