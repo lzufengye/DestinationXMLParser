@@ -64,7 +64,7 @@ class DestinationXMLParser
     depth += 1
     return if node.text?
 
-    @output_file.print node.node_name if node.node_name
+    @output_file.print "- #{node.node_name}" if node.node_name
     if node.node_name == 'history'
       print_tab depth
       @output_file.print node.at_xpath('history').text.gsub(/\n/, ' ')
