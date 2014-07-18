@@ -32,119 +32,11 @@ class DestinationXMLParser
 
   def handle_atlas(depth, node)
     print_atlas(depth, node)
-
+    depth += 1
     atlas_destinations = select_destination_by_atlas_id node['atlas_node_id']
     atlas_destinations.each do |destination_node|
-      print_destination depth, destination_node
+      print_destination_node destination_node, depth
     end
-  end
-
-  def print_destination(depth, node)
-    print_history(depth, node)
-    print_introductory(depth, node)
-    print_practical_information(depth, node)
-    print_transport(depth, node)
-    print_weather(depth, node)
-    print_work_live_study(depth, node)
-    @output_file.puts ''
-  end
-
-  def print_work_live_study(depth, node)
-    print_tab depth+2
-    @output_file.print '- work_live_study'
-    print_tab depth+4
-    @output_file.print '- work'
-    print_tab depth+6
-    @output_file.print '- business'
-    print_desgitnation_info node.at_xpath('work_live_study/work'), 'business'
-    print_tab depth+6
-    @output_file.print '- overview'
-    print_desgitnation_info node.at_xpath('work_live_study/work'), 'overview' if node
-  end
-
-  def print_weather(depth, node)
-    print_tab depth+2
-    @output_file.print '- weather'
-    print_tab depth+4
-    @output_file.print '- when_to_go'
-    print_tab depth+6
-    @output_file.print '- climate'
-    print_desgitnation_info node.at_xpath('weather/when_to_go'), 'climate' if node
-  end
-
-  def print_transport(depth, node)
-    print_tab depth+2
-    @output_file.print '- transport'
-    print_tab depth+4
-    @output_file.print '- getting_there_and_around'
-    print_tab depth+6
-    @output_file.print '- air'
-    print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'air'
-    print_tab depth+6
-    @output_file.print '- bicycle'
-    print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'bicycle'
-    print_tab depth+6
-    @output_file.print '- bus_and_tram'
-    print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'bus_and_tram'
-    print_tab depth+6
-    @output_file.print '- car_and_motorcycle'
-    print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'car_and_motorcycle'
-    print_tab depth+6
-    @output_file.print '- local_transport'
-    print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'local_transport'
-    print_tab depth+6
-    @output_file.print '- overview'
-    print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'overview' if node
-    print_tab depth+6
-    @output_file.print '- train'
-    print_desgitnation_info node.at_xpath('transport/getting_there_and_around'), 'train'
-  end
-
-  def print_practical_information(depth, node)
-    print_tab depth+2
-    @output_file.print '- practical_information'
-    print_tab depth+4
-    @output_file.print '- health_and_safety'
-    print_tab depth+6
-    @output_file.print '- dangers_and_annoyances'
-    print_desgitnation_info node.at_xpath('practical_information/health_and_safety'), 'dangers_and_annoyances'
-    print_tab depth+6
-    @output_file.print '- while_youre_there'
-    print_desgitnation_info node.at_xpath('practical_information/while_youre_there'), 'while_youre_there'
-    print_tab depth+4
-    @output_file.print '- money_and_costs'
-    print_tab depth+6
-    @output_file.print '- costs'
-    print_desgitnation_info node.at_xpath('practical_information/money_and_costs'), 'costs'
-    print_tab depth+6
-    print_desgitnation_info node, 'money'
-    print_tab depth+4
-    @output_file.print '- visas'
-    print_tab depth+6
-    @output_file.print '- overview'
-    print_desgitnation_info node.at_xpath('practical_information/visas'), 'overview' if node
-  end
-
-  def print_introductory(depth, node)
-    print_tab depth+2
-    @output_file.print '- introductory'
-    print_tab depth+4
-    @output_file.print '- introduction'
-    print_tab depth+6
-    @output_file.print '- overview '
-    print_desgitnation_info node.at_xpath('introductory/introduction'), 'overview' if node
-  end
-
-  def print_history(depth, node)
-    print_tab depth+2
-    @output_file.print '- history:'
-    print_tab depth+4
-    print_desgitnation_info node, 'history'
-  end
-
-  def print_desgitnation_info node, title
-    return unless node
-    @output_file.print node.at_xpath(title).text.sub(/\n\n\n/, '') if node.at_xpath(title)
   end
 
   def print_atlas(depth, node)
@@ -165,5 +57,17 @@ class DestinationXMLParser
   def print_tab depth
     @output_file.puts ''
     depth.times { @output_file.print '  ' }
+  end
+
+
+  def print_destination_node node, depth
+    print_tab depth
+    depth += 1
+    return if node.text?
+    @output_file.print node.node_name if node.node_name
+    @output_file.print node.text unless node.node_name
+    node.children.each do |child_node|
+      print_destination_node child_node, depth
+    end
   end
 end
